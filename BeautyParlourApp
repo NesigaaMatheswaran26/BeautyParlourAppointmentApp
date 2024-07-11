@@ -1,0 +1,216 @@
+i).BeautyParlourApp:
+
+package com.beautyparlour;
+
+import java.util.List;
+import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.InputMismatchException;
+
+public class BeautyParlourApp {
+
+    static List<Service> services = new ArrayList<>();
+    static List<BeautyParlourAppointment> appointments = new ArrayList<>();
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        initializeServices();
+
+        while (true) {
+            System.out.println("Welcome to Zazzle Beauty Parlour");
+            System.out.println("Available Services:");
+            displayServices();
+
+            System.out.println("Enter customer name: ");
+            String name = sc.nextLine();
+            List<Service> selectedServices = selectServices(scanner);
+            double totalAmount = calculateTotal(selectedServices);
+            System.out.println("Total Amount: $" + totalAmount);
+            recordAppointment(scanner, name, selectedServices);
+            viewOldOrders();
+            cancelOrder(scanner);
+
+            System.out.println("Do you want to continue shopping? (yes/no)");
+            String continueShopping = scanner.next();
+            sc.nextLine(); 
+            if (!continueShopping.equalsIgnoreCase("yes")) {
+                break;
+            }
+        }
+
+        sc.close();
+    }
+
+    public static void initializeServices() {
+        services.add(new Service("Facial", 500.0));
+        services.add(new Service("Hair Cutting", 300.0));
+        services.add(new Service("Hair Spa", 400.0));
+        services.add(new Service("Manicure", 600.0));
+        services.add(new Service("Pedicure", 700.0));
+        services.add(new Service("Hair Color", 1000.0));
+        services.add(new Service("Face Detox", 1200.0));
+        services.add(new Service("Keratin Treatment", 4599.0));
+        services.add(new Service("Botox Treatment", 7999.0));
+        services.add(new Service("Styling", 2500.0));
+    }
+
+    public static void displayServices() {
+        for (int i = 0; i < services.size(); i++) {
+            System.out.println((i + 1) + ". " + services.get(i).getServiceName() + " - $" + services.get(i).getPrice());
+        }
+    }
+
+    public static List<Service> selectServices(Scanner scanner) {
+        List<Service> selectedServices = new ArrayList<>();
+        System.out.println("Enter the number of services you want to select: ");
+        int numServices = 0;
+        try {
+            numServices = sc.nextInt();
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid input. Please enter a valid integer.");
+            sc.nextLine();
+            return selectedServices;
+        }
+        scanner.nextLine(); 
+        for (int i = 0; i < numServices; i++) {
+            System.out.println("Enter service number " + (i + 1) + ": ");
+            int serviceIndex = 0;
+            try {
+                serviceIndex = scanner.nextInt();
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter a valid integer.");
+                sc.nextLine();
+                return selectedServices;
+            }
+            if (serviceIndex < 1 || serviceIndex > services.size()) {
+                System.out.println("Invalid service number. Please select a valid service.");
+                i--; 
+                continue;
+            }
+            selectedServices.add(services.get(serviceIndex - 1));
+        }
+        return selectedServices;
+    }
+
+    public static double calculateTotal(List<Service> selectedServices) {
+        double totalAmount = 0.0;
+        for (Service service : selectedServices) {
+            totalAmount += service.getPrice();
+        }
+        return totalAmount;
+    }
+
+    public static void recordAppointment(Scanner scanner, String name, List<Service> selectedServices) {
+        System.out.println("Enter appointment date (DD/MM/YYYY): ");
+        String date = sc.next();
+        System.out.println("Enter appointment time: ");
+        String time = sc.next();
+        sc.nextLine(); 
+        appointments.add(new BeautyParlourAppointment(name, date, time, selectedServices));
+    }
+
+    public static void viewOldOrders() {
+        System.out.println("Old Orders:");
+        for (BeautyParlourAppointment appointment : appointments) {
+            System.out.println("Customer: " + appointment.getCustomerName() +
+                    ", Date: " + appointment.getAppointmentDate() +
+                    ", Time: " + appointment.getAppointmentTime() +
+                    ", Services: " + appointment.getServicesAsString());
+        }
+    }
+
+    public static void cancelOrder(Scanner scanner) {
+        System.out.println("Do you want to cancel any order? (yes/no)");
+        String cancelOption = sc.next();
+        if (cancelOption.equalsIgnoreCase("yes")) {
+            if (appointments.isEmpty()) {
+                System.out.println("No orders to cancel.");
+                return;
+            }
+
+            System.out.println("Enter the index of the order you want to cancel: ");
+            int cancelIndex = 0;
+            try {
+                cancelIndex = sc.nextInt();
+                if (cancelIndex < 1 || cancelIndex > appointments.size()) {
+                    return;
+                }
+                appointments.remove(cancelIndex - 1);
+                System.out.println("------Order cancelled successfully.------");
+                System.out.println("Thank you for Visiting! Your Remaining orders has been successfully Completed!!.");
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter a valid index.");
+                sc.nextLine();
+            }
+        } else {
+            System.out.println("Thank you for Visiting! Your order has been successfully Completed!!.");
+        }
+    }
+}
+
+ii).BeautyParlourAppointment:
+
+package com.beautyparlour;
+import java.util.List;
+
+public class BeautyParlourAppointment {
+     String customerName;
+     String appointmentDate;
+     String appointmentTime;
+     List<Service> services;
+
+    public BeautyParlourAppointment(String name, String date, String time, List<Service> services) {
+        customerName = name;
+        appointmentDate = date;
+        appointmentTime = time;
+        this.services = services;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public String getAppointmentDate() {
+        return appointmentDate;
+    }
+
+    public String getAppointmentTime() {
+        return appointmentTime;
+    }
+
+    public String getServicesAsString() {
+        StringBuilder sb = new StringBuilder();
+        for (Service service : services) {
+            sb.append(service.getServiceName()).append(", ");
+        }
+        if (sb.length() >= 2) {
+            return sb.substring(0, sb.length() - 2);
+        } else {
+            return "";
+        }
+    }
+}
+
+iii).Service:
+
+package com.beautyparlour;
+
+public class Service {
+     String serviceName;
+     double price;
+
+    public Service(String name, double price) {
+        this.serviceName = name;
+        this.price = price;
+    }
+
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+}
+
+
